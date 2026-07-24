@@ -3,29 +3,109 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Todo List</title>
+  <title>Flow-Force Database</title>
   <style>
-    body { font-family: Arial; margin: 40px; }
+    body { 
+      font-family: Arial, sans-serif; 
+      max-width: 800px; 
+      margin: 40px auto; 
+      padding: 20px; 
+      background: #f8f9fa;
+    }
+    h1 { text-align: center; color: #0066ff; }
+    .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    input { width: 70%; padding: 12px; font-size: 16px; }
+    button { 
+      padding: 12px 20px; 
+      background: #0066ff; 
+      color: white; 
+      border: none; 
+      border-radius: 5px; 
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover { background: #0055dd; }
     ul { list-style: none; padding: 0; }
-    li { padding: 10px; margin: 5px 0; background: #f0f0f0; border-radius: 5px; }
+    li { 
+      padding: 15px; 
+      background: #f0f0f0; 
+      margin: 10px 0; 
+      border-radius: 8px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+    }
+    .completed { text-decoration: line-through; opacity: 0.6; }
   </style>
 </head>
 <body>
-  <h1>My Todos</h1>
-  <ul id="todo-list"></ul>
+  <h1>🌊 Flow-Force</h1>
+  <p style="text-align:center;">A new project starting 07/24/26 — Global Commercial Industries Database</p>
+
+  <div class="container">
+    <h2>Add New Entry</h2>
+    <input type="text" id="title" placeholder="Enter title or item name..." />
+    <button onclick="addEntry()">Add to Database</button>
+
+    <h2>Database Entries</h2>
+    <ul id="list"></ul>
+  </div>
 
   <script>
-    fetch('db.json')
-      .then(response => response.json())
-      .then(data => {
-        const list = document.getElementById('todo-list');
-        data.todos.forEach(todo => {
-          const li = document.createElement('li');
-          li.textContent = `${todo.title} - ${todo.status} (${todo.priority})`;
-          list.appendChild(li);
-        });
-      })
-      .catch(err => console.error("Error loading database", err));
+    let items = [];
+
+    async function loadData() {
+      try {
+        const res = await fetch('db.json');
+        const data = await res.json();
+        items = data.items || data.todos || [];
+      } catch(e) {
+        items = [];
+      }
+      
+      // Load from browser memory
+      const saved = localStorage.getItem('flowforce_data');
+      if (saved) items = JSON.parse(saved);
+
+      renderList();
+    }
+
+    function renderList() {
+      const list = document.getElementById('list');
+      list.innerHTML = '';
+      
+      items.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.className = item.completed ? 'completed' : '';
+        li.innerHTML = `
+          <span>${item.title}</span>
+          <button onclick="toggleComplete(${index})">${item.completed ? '✓ Done' : 'Mark Done'}</button>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    function addEntry() {
+      const input = document.getElementById('title');
+      const title = input.value.trim();
+      
+      if (!title) return alert("Please enter something");
+      
+      items.push({ title: title, completed: false });
+      localStorage.setItem('flowforce_data', JSON.stringify(items));
+      
+      input.value = '';
+      renderList();
+    }
+
+    function toggleComplete(index) {
+      items[index].completed = !items[index].completed;
+      localStorage.setItem('flowforce_data', JSON.stringify(items));
+      renderList();
+    }
+
+    // Start everything
+    loadData();
   </script>
 </body>
 </html>
