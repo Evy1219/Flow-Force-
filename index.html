@@ -30,11 +30,7 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.3);
       animation: fadeIn 0.5s ease;
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
     input, select, textarea { 
       width: 100%; padding: 14px; margin: 10px 0; 
@@ -55,19 +51,26 @@
       border-radius: 12px; 
       display: flex; 
       align-items: center; 
-      gap: 12px;
+      gap: 15px;
       transition: all 0.3s;
     }
     li:hover { transform: translateX(8px); background: #475569; }
-    li.completed { opacity: 0.75; text-decoration: line-through; }
 
     .delete-btn { 
       background: #ef4444; 
-      padding: 6px 12px; 
+      padding: 6px 14px; 
       font-size: 14px; 
       margin-left: auto;
     }
-    .message { padding: 12px; background: #166534; color: #86efac; border-radius: 10px; text-align: center; margin: 10px 0; }
+    .message { 
+      padding: 12px; 
+      background: #166534; 
+      color: #86efac; 
+      border-radius: 10px; 
+      text-align: center; 
+      margin: 10px 0; 
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -81,7 +84,7 @@
     <button class="tab" onclick="showTab(3)">Goals</button>
   </div>
 
-  <!-- Tasks Tab -->
+  <!-- Tasks -->
   <div id="tab0" class="tab-content">
     <div class="card">
       <h2>Add New Task</h2>
@@ -93,11 +96,11 @@
       </select>
       <button onclick="addTask()">Add Task</button>
     </div>
-    <div id="taskMessage" class="message" style="display:none"></div>
+    <div id="taskMessage" class="message"></div>
     <ul id="taskList"></ul>
   </div>
 
-  <!-- Other tabs (simplified for now) -->
+  <!-- Expenses -->
   <div id="tab1" class="tab-content" style="display:none">
     <div class="card">
       <h2>Add Expense</h2>
@@ -105,25 +108,30 @@
       <input type="number" id="expAmount" placeholder="Amount in USD" step="0.01">
       <button onclick="addExpense()">Add Expense</button>
     </div>
+    <div id="expMessage" class="message"></div>
     <canvas id="expenseChart" height="220"></canvas>
     <ul id="expenseList"></ul>
   </div>
 
+  <!-- Notes -->
   <div id="tab2" class="tab-content" style="display:none">
     <div class="card">
-      <h2>Add Note</h2>
-      <textarea id="noteText" rows="4" placeholder="Write detailed note or idea..."></textarea>
+      <h2>Add Note / Idea</h2>
+      <textarea id="noteText" rows="4" placeholder="Write detailed note..."></textarea>
       <button onclick="addNote()">Save Note</button>
     </div>
+    <div id="noteMessage" class="message"></div>
     <ul id="noteList"></ul>
   </div>
 
+  <!-- Goals -->
   <div id="tab3" class="tab-content" style="display:none">
     <div class="card">
-      <h2>Add Goal</h2>
+      <h2>Add Goal / Target</h2>
       <input type="text" id="goalTitle" placeholder="Enter your goal or target">
       <button onclick="addGoal()">Add Goal</button>
     </div>
+    <div id="goalMessage" class="message"></div>
     <ul id="goalList"></ul>
   </div>
 
@@ -140,42 +148,48 @@
       localStorage.setItem('flowforce_db', JSON.stringify(db));
     }
 
+    function showMessage(id, text) {
+      const msg = document.getElementById(id);
+      if (msg) {
+        msg.textContent = text;
+        msg.style.display = 'block';
+        setTimeout(() => msg.style.display = 'none', 2500);
+      }
+    }
+
     function showTab(n) {
       document.querySelectorAll('.tab-content').forEach(div => div.style.display = 'none');
       document.getElementById('tab' + n).style.display = 'block';
       document.querySelectorAll('.tab').forEach((btn, i) => btn.classList.toggle('active', i === n));
-      if (n === 1) setTimeout(renderChart, 200);
     }
 
     function renderAll() {
-      // Tasks with checkbox
-      const taskHTML = db.tasks.map((task, i) => `
-        <li class="${task.completed ? 'completed' : ''}">
-          <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleComplete(${i})">
-          <span>${task.title} <small>(${task.priority})</small></span>
+      // Tasks - Clean display without checkbox box
+      document.getElementById('taskList').innerHTML = db.tasks.map((task, i) => `
+        <li>
+          <span><strong>${task.title}</strong> <small>(${task.priority})</small></span>
           <button class="delete-btn" onclick="deleteItem('tasks', ${i})">Delete</button>
         </li>
       `).join('');
-      document.getElementById('taskList').innerHTML = taskHTML;
 
-      // Expenses
+      // Other sections
       document.getElementById('expenseList').innerHTML = db.expenses.map((e, i) => `
-        <li>$${e.amount} — ${e.desc} <button class="delete-btn" onclick="deleteItem('expenses', ${i})">Delete</button></li>
+        <li>$${e.amount} — ${e.desc} 
+          <button class="delete-btn" onclick="deleteItem('expenses', ${i})">Delete</button>
+        </li>
       `).join('');
 
-      // Notes & Goals (similar)
       document.getElementById('noteList').innerHTML = db.notes.map((n, i) => `
-        <li>${n.text} <button class="delete-btn" onclick="deleteItem('notes', ${i})">Delete</button></li>
+        <li>${n.text} 
+          <button class="delete-btn" onclick="deleteItem('notes', ${i})">Delete</button>
+        </li>
       `).join('');
 
       document.getElementById('goalList').innerHTML = db.goals.map((g, i) => `
-        <li>🎯 ${g.title} <button class="delete-btn" onclick="deleteItem('goals', ${i})">Delete</button></li>
+        <li>🎯 ${g.title} 
+          <button class="delete-btn" onclick="deleteItem('goals', ${i})">Delete</button>
+        </li>
       `).join('');
-    }
-
-    function renderChart() {
-      // Simple chart for expenses
-      // (You can expand this later)
     }
 
     function addTask() {
@@ -183,23 +197,44 @@
       if (!title) return;
       db.tasks.push({
         title: title,
-        priority: document.getElementById('taskPriority').value,
-        completed: false
+        priority: document.getElementById('taskPriority').value
       });
       saveData();
       renderAll();
       document.getElementById('taskTitle').value = '';
-      
-      const msg = document.getElementById('taskMessage');
-      msg.textContent = '✅ Task added successfully!';
-      msg.style.display = 'block';
-      setTimeout(() => msg.style.display = 'none', 2500);
+      showMessage('taskMessage', '✅ Task added successfully!');
     }
 
-    function toggleComplete(index) {
-      db.tasks[index].completed = !db.tasks[index].completed;
+    function addExpense() {
+      const desc = document.getElementById('expDesc').value.trim();
+      const amount = parseFloat(document.getElementById('expAmount').value);
+      if (!desc || !amount) return;
+      db.expenses.push({desc, amount});
       saveData();
       renderAll();
+      document.getElementById('expDesc').value = '';
+      document.getElementById('expAmount').value = '';
+      showMessage('expMessage', '✅ Expense added successfully!');
+    }
+
+    function addNote() {
+      const text = document.getElementById('noteText').value.trim();
+      if (!text) return;
+      db.notes.push({text});
+      saveData();
+      renderAll();
+      document.getElementById('noteText').value = '';
+      showMessage('noteMessage', '✅ Note saved successfully!');
+    }
+
+    function addGoal() {
+      const title = document.getElementById('goalTitle').value.trim();
+      if (!title) return;
+      db.goals.push({title});
+      saveData();
+      renderAll();
+      document.getElementById('goalTitle').value = '';
+      showMessage('goalMessage', '✅ Goal added successfully!');
     }
 
     function deleteItem(category, index) {
@@ -207,41 +242,6 @@
         db[category].splice(index, 1);
         saveData();
         renderAll();
-      }
-    }
-
-    function addExpense() {
-      const desc = document.getElementById('expDesc').value.trim();
-      const amount = parseFloat(document.getElementById('expAmount').value);
-      if (desc && amount) {
-        db.expenses.push({desc, amount});
-        saveData();
-        renderAll();
-        document.getElementById('expDesc').value = '';
-        document.getElementById('expAmount').value = '';
-        alert('✅ Expense added');
-      }
-    }
-
-    function addNote() {
-      const text = document.getElementById('noteText').value.trim();
-      if (text) {
-        db.notes.push({text});
-        saveData();
-        renderAll();
-        document.getElementById('noteText').value = '';
-        alert('✅ Note saved');
-      }
-    }
-
-    function addGoal() {
-      const title = document.getElementById('goalTitle').value.trim();
-      if (title) {
-        db.goals.push({title});
-        saveData();
-        renderAll();
-        document.getElementById('goalTitle').value = '';
-        alert('✅ Goal added');
       }
     }
 
