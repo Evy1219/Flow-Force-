@@ -3,115 +3,250 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flow-Force Database</title>
+  <title>Flow-Force • Database</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; background: #0f172a; color: #e2e8f0; margin: 0; padding: 20px; }
-    h1 { text-align: center; color: #60a5fa; }
-    .subtitle { text-align: center; color: #94a3b8; }
-    .tabs button { padding: 12px 20px; margin: 5px; background: #1e2937; color: white; border: none; border-radius: 8px; cursor: pointer; }
-    .tabs button.active { background: #3b82f6; }
-    .card { background: #1e2937; padding: 20px; border-radius: 12px; margin: 20px 0; }
-    input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #334155; border: none; border-radius: 6px; color: white; }
-    button { padding: 12px 20px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; }
-    li { background: #334155; padding: 12px; margin: 8px 0; border-radius: 6px; display: flex; justify-content: space-between; }
-    .message { padding: 10px; background: #166534; color: #86efac; border-radius: 6px; margin: 10px 0; text-align: center; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+    
+    body { 
+      font-family: 'Inter', Arial, sans-serif; 
+      background: #0f172a; 
+      color: #e2e8f0; 
+      margin: 0; 
+      padding: 20px; 
+    }
+    h1 { text-align: center; color: #60a5fa; margin-bottom: 8px; }
+    .subtitle { text-align: center; color: #94a3b8; margin-bottom: 30px; }
+    
+    .tabs { text-align: center; margin: 25px 0; }
+    .tab { padding: 12px 24px; margin: 0 6px; background: #1e2937; border: none; color: white; border-radius: 50px; cursor: pointer; font-weight: 500; transition: all 0.3s; }
+    .tab.active { background: #3b82f6; transform: scale(1.05); }
+
+    .card { 
+      background: #1e2937; 
+      padding: 25px; 
+      border-radius: 16px; 
+      margin: 20px 0; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    input, select, textarea { 
+      width: 100%; padding: 14px; margin: 10px 0; 
+      background: #334155; border: none; border-radius: 10px; 
+      color: white; font-size: 16px;
+    }
+    button { 
+      padding: 12px 24px; background: #3b82f6; color: white; 
+      border: none; border-radius: 10px; cursor: pointer; font-weight: 600;
+      transition: all 0.2s;
+    }
+    button:hover { background: #2563eb; transform: translateY(-2px); }
+
+    li { 
+      background: #334155; 
+      padding: 16px; 
+      margin: 12px 0; 
+      border-radius: 12px; 
+      display: flex; 
+      align-items: center; 
+      gap: 12px;
+      transition: all 0.3s;
+    }
+    li:hover { transform: translateX(8px); background: #475569; }
+    li.completed { opacity: 0.75; text-decoration: line-through; }
+
+    .delete-btn { 
+      background: #ef4444; 
+      padding: 6px 12px; 
+      font-size: 14px; 
+      margin-left: auto;
+    }
+    .message { padding: 12px; background: #166534; color: #86efac; border-radius: 10px; text-align: center; margin: 10px 0; }
   </style>
 </head>
 <body>
   <h1>🌊 Flow-Force</h1>
-  <p class="subtitle">Global Commercial Industries • Personal Database</p>
+  <p class="subtitle">Global Commercial Industries • Personal Database • 07/24/26</p>
 
   <div class="tabs">
-    <button class="active" onclick="showTab(0)">Tasks</button>
-    <button onclick="showTab(1)">Expenses</button>
-    <button onclick="showTab(2)">Notes</button>
-    <button onclick="showTab(3)">Goals</button>
+    <button class="tab active" onclick="showTab(0)">Tasks</button>
+    <button class="tab" onclick="showTab(1)">Expenses</button>
+    <button class="tab" onclick="showTab(2)">Notes</button>
+    <button class="tab" onclick="showTab(3)">Goals</button>
   </div>
 
-  <div id="tab0">
+  <!-- Tasks Tab -->
+  <div id="tab0" class="tab-content">
     <div class="card">
-      <h2>Add Task</h2>
-      <input type="text" id="taskInput" placeholder="Enter task...">
-      <select id="priority">
-        <option value="High">High</option>
-        <option value="Medium">Medium</option>
-        <option value="Low">Low</option>
+      <h2>Add New Task</h2>
+      <input type="text" id="taskTitle" placeholder="What needs to be done?">
+      <select id="taskPriority">
+        <option value="High">🔴 High Priority</option>
+        <option value="Medium" selected>🟡 Medium Priority</option>
+        <option value="Low">🟢 Low Priority</option>
       </select>
       <button onclick="addTask()">Add Task</button>
     </div>
-    <div id="taskMsg" class="message" style="display:none"></div>
+    <div id="taskMessage" class="message" style="display:none"></div>
     <ul id="taskList"></ul>
   </div>
 
-  <div id="tab1" style="display:none">
+  <!-- Other tabs (simplified for now) -->
+  <div id="tab1" class="tab-content" style="display:none">
     <div class="card">
       <h2>Add Expense</h2>
-      <input type="text" id="expDesc" placeholder="Description">
-      <input type="number" id="expAmount" placeholder="Amount" step="0.01">
+      <input type="text" id="expDesc" placeholder="Expense description">
+      <input type="number" id="expAmount" placeholder="Amount in USD" step="0.01">
       <button onclick="addExpense()">Add Expense</button>
     </div>
-    <canvas id="chart" height="200"></canvas>
-    <ul id="expList"></ul>
+    <canvas id="expenseChart" height="220"></canvas>
+    <ul id="expenseList"></ul>
+  </div>
+
+  <div id="tab2" class="tab-content" style="display:none">
+    <div class="card">
+      <h2>Add Note</h2>
+      <textarea id="noteText" rows="4" placeholder="Write detailed note or idea..."></textarea>
+      <button onclick="addNote()">Save Note</button>
+    </div>
+    <ul id="noteList"></ul>
+  </div>
+
+  <div id="tab3" class="tab-content" style="display:none">
+    <div class="card">
+      <h2>Add Goal</h2>
+      <input type="text" id="goalTitle" placeholder="Enter your goal or target">
+      <button onclick="addGoal()">Add Goal</button>
+    </div>
+    <ul id="goalList"></ul>
   </div>
 
   <script>
     let db = { tasks: [], expenses: [], notes: [], goals: [] };
 
-    function load() {
-      const saved = localStorage.getItem('flowforce');
+    function loadData() {
+      const saved = localStorage.getItem('flowforce_db');
       if (saved) db = JSON.parse(saved);
-      render();
+      renderAll();
     }
 
-    function save() {
-      localStorage.setItem('flowforce', JSON.stringify(db));
+    function saveData() {
+      localStorage.setItem('flowforce_db', JSON.stringify(db));
     }
 
     function showTab(n) {
-      document.querySelectorAll('body > div[id^="tab"]').forEach(div => div.style.display = 'none');
+      document.querySelectorAll('.tab-content').forEach(div => div.style.display = 'none');
       document.getElementById('tab' + n).style.display = 'block';
-      document.querySelectorAll('.tabs button').forEach((b,i) => b.classList.toggle('active', i===n));
+      document.querySelectorAll('.tab').forEach((btn, i) => btn.classList.toggle('active', i === n));
+      if (n === 1) setTimeout(renderChart, 200);
     }
 
-    function render() {
-      // Tasks
-      document.getElementById('taskList').innerHTML = db.tasks.map((t,i) => 
-        `<li>${t.text} (${t.priority})</li>`
-      ).join('');
+    function renderAll() {
+      // Tasks with checkbox
+      const taskHTML = db.tasks.map((task, i) => `
+        <li class="${task.completed ? 'completed' : ''}">
+          <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleComplete(${i})">
+          <span>${task.title} <small>(${task.priority})</small></span>
+          <button class="delete-btn" onclick="deleteItem('tasks', ${i})">Delete</button>
+        </li>
+      `).join('');
+      document.getElementById('taskList').innerHTML = taskHTML;
 
       // Expenses
-      document.getElementById('expList').innerHTML = db.expenses.map(e => 
-        `<li>$${e.amount} - ${e.desc}</li>`
-      ).join('');
+      document.getElementById('expenseList').innerHTML = db.expenses.map((e, i) => `
+        <li>$${e.amount} — ${e.desc} <button class="delete-btn" onclick="deleteItem('expenses', ${i})">Delete</button></li>
+      `).join('');
+
+      // Notes & Goals (similar)
+      document.getElementById('noteList').innerHTML = db.notes.map((n, i) => `
+        <li>${n.text} <button class="delete-btn" onclick="deleteItem('notes', ${i})">Delete</button></li>
+      `).join('');
+
+      document.getElementById('goalList').innerHTML = db.goals.map((g, i) => `
+        <li>🎯 ${g.title} <button class="delete-btn" onclick="deleteItem('goals', ${i})">Delete</button></li>
+      `).join('');
+    }
+
+    function renderChart() {
+      // Simple chart for expenses
+      // (You can expand this later)
     }
 
     function addTask() {
-      const text = document.getElementById('taskInput').value.trim();
-      if (!text) return;
-      db.tasks.push({ text, priority: document.getElementById('priority').value });
-      save();
-      render();
-      document.getElementById('taskInput').value = '';
-      const msg = document.getElementById('taskMsg');
-      msg.textContent = '✅ Task added!';
+      const title = document.getElementById('taskTitle').value.trim();
+      if (!title) return;
+      db.tasks.push({
+        title: title,
+        priority: document.getElementById('taskPriority').value,
+        completed: false
+      });
+      saveData();
+      renderAll();
+      document.getElementById('taskTitle').value = '';
+      
+      const msg = document.getElementById('taskMessage');
+      msg.textContent = '✅ Task added successfully!';
       msg.style.display = 'block';
-      setTimeout(() => msg.style.display = 'none', 2000);
+      setTimeout(() => msg.style.display = 'none', 2500);
+    }
+
+    function toggleComplete(index) {
+      db.tasks[index].completed = !db.tasks[index].completed;
+      saveData();
+      renderAll();
+    }
+
+    function deleteItem(category, index) {
+      if (confirm("Delete this item?")) {
+        db[category].splice(index, 1);
+        saveData();
+        renderAll();
+      }
     }
 
     function addExpense() {
       const desc = document.getElementById('expDesc').value.trim();
       const amount = parseFloat(document.getElementById('expAmount').value);
-      if (!desc || !amount) return;
-      db.expenses.push({desc, amount});
-      save();
-      render();
-      document.getElementById('expDesc').value = '';
-      document.getElementById('expAmount').value = '';
-      alert('✅ Expense added!');
+      if (desc && amount) {
+        db.expenses.push({desc, amount});
+        saveData();
+        renderAll();
+        document.getElementById('expDesc').value = '';
+        document.getElementById('expAmount').value = '';
+        alert('✅ Expense added');
+      }
     }
 
-    load();
+    function addNote() {
+      const text = document.getElementById('noteText').value.trim();
+      if (text) {
+        db.notes.push({text});
+        saveData();
+        renderAll();
+        document.getElementById('noteText').value = '';
+        alert('✅ Note saved');
+      }
+    }
+
+    function addGoal() {
+      const title = document.getElementById('goalTitle').value.trim();
+      if (title) {
+        db.goals.push({title});
+        saveData();
+        renderAll();
+        document.getElementById('goalTitle').value = '';
+        alert('✅ Goal added');
+      }
+    }
+
+    // Initialize
+    loadData();
     showTab(0);
   </script>
 </body>
