@@ -6,153 +6,156 @@
   <title>Flow-Force • Commercial OS</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-    body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; margin: 0; padding: 20px; }
+    body { font-family: 'Inter', Arial, sans-serif; background: #0f172a; color: #e2e8f0; margin: 0; padding: 20px; }
     h1 { text-align: center; color: #60a5fa; }
-    .subtitle { text-align: center; color: #94a3b8; margin-bottom: 30px; }
-    .card { background: #1e2937; padding: 20px; border-radius: 16px; margin: 15px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-    .tabs { text-align: center; margin: 20px 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-    .tab { padding: 12px 20px; background: #1e2937; border: none; color: white; border-radius: 50px; cursor: pointer; font-weight: 500; }
-    .tab.active { background: #3b82f6; }
+    .subtitle { text-align: center; color: #94a3b8; }
+    .tabs button { padding: 12px 20px; margin: 5px; background: #1e2937; border: none; color: white; border-radius: 50px; cursor: pointer; }
+    .tabs button.active { background: #3b82f6; }
+    .card { background: #1e2937; padding: 25px; border-radius: 16px; margin: 20px 0; }
     input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #334155; border: none; border-radius: 8px; color: white; }
-    button { padding: 12px 20px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
-    button:hover { background: #2563eb; }
-    li { background: #334155; padding: 14px; margin: 10px 0; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
-    .message { padding: 12px; background: #166534; color: #86efac; border-radius: 8px; text-align: center; margin: 10px 0; display: none; }
+    button { padding: 10px 18px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; margin: 5px; }
+    li { background: #334155; padding: 15px; margin: 10px 0; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .message { padding: 12px; background: #166534; color: #86efac; border-radius: 10px; text-align: center; margin: 10px 0; display: none; }
   </style>
 </head>
 <body>
   <h1>🌊 Flow-Force Commercial OS</h1>
-  <p class="subtitle">Global Commercial Industries • Business Operations Hub • Started 07/24/26</p>
+  <p class="subtitle">Global Commercial Industries • Business Operations Hub</p>
 
   <div class="tabs">
-    <button class="tab active" onclick="showTab(0)">Dashboard</button>
-    <button class="tab" onclick="showTab(1)">Leads</button>
-    <button class="tab" onclick="showTab(2)">Projects</button>
-    <button class="tab" onclick="showTab(3)">Sales</button>
-    <button class="tab" onclick="showTab(4)">Tasks</button>
-    <button class="tab" onclick="showTab(5)">Expenses</button>
+    <button class="active" onclick="showTab(0)">Dashboard</button>
+    <button onclick="showTab(1)">Leads</button>
+    <button onclick="showTab(2)">Projects</button>
+    <button onclick="showTab(3)">Tasks</button>
+    <button onclick="showTab(4)">Expenses</button>
   </div>
 
   <!-- Dashboard -->
-  <div id="tab0" class="tab-content">
-    <div class="card">
-      <h2>Business Overview</h2>
-      <p>Total Leads: <strong id="totalLeads">0</strong> | Active Projects: <strong id="activeProjects">0</strong></p>
-      <canvas id="dashboardChart" height="180"></canvas>
-    </div>
+  <div id="tab0" class="card">
+    <h2>Business Overview</h2>
+    <canvas id="dashChart" height="200"></canvas>
   </div>
 
   <!-- Leads -->
-  <div id="tab1" class="tab-content" style="display:none">
-    <div class="card">
-      <h2>New Lead</h2>
-      <input type="text" id="leadName" placeholder="Company / Client Name">
-      <input type="text" id="leadContact" placeholder="Contact Person or Email">
-      <select id="leadStatus">
-        <option value="New">New</option>
-        <option value="Contacted">Contacted</option>
-        <option value="Negotiation">Negotiation</option>
-        <option value="Closed">Closed Won</option>
-      </select>
-      <button onclick="addLead()">Add Lead</button>
-      <div id="leadMessage" class="message"></div>
-      <ul id="leadList"></ul>
-    </div>
+  <div id="tab1" class="card" style="display:none">
+    <h2>New Lead</h2>
+    <input type="text" id="leadName" placeholder="Client / Company">
+    <input type="text" id="leadContact" placeholder="Contact Info">
+    <select id="leadStatus">
+      <option value="New">New</option>
+      <option value="Contacted">Contacted</option>
+      <option value="Negotiation">Negotiation</option>
+      <option value="Closed">Closed</option>
+    </select>
+    <button onclick="addLead()">Add Lead</button>
+    <div id="leadMsg" class="message"></div>
+    <ul id="leadList"></ul>
   </div>
 
-  <!-- Projects -->
-  <div id="tab2" class="tab-content" style="display:none">
-    <div class="card">
-      <h2>New Project</h2>
-      <input type="text" id="projectName" placeholder="Project Name">
-      <select id="projectStatus">
-        <option value="Planning">Planning</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Review">Review</option>
-        <option value="Completed">Completed</option>
-      </select>
-      <button onclick="addProject()">Add Project</button>
-      <ul id="projectList"></ul>
-    </div>
-  </div>
-
-  <!-- Sales -->
-  <div id="tab3" class="tab-content" style="display:none">
-    <div class="card">
-      <h2>New Sale / Revenue</h2>
-      <input type="text" id="saleDesc" placeholder="Sale Description">
-      <input type="number" id="saleAmount" placeholder="Amount ($)" step="0.01">
-      <button onclick="addSale()">Record Sale</button>
-      <ul id="saleList"></ul>
-    </div>
+  <!-- Projects (Enhanced) -->
+  <div id="tab2" class="card" style="display:none">
+    <h2>New Project</h2>
+    <input type="text" id="projName" placeholder="Project Name">
+    <select id="projCategory">
+      <option value="Development">Development</option>
+      <option value="Marketing">Marketing</option>
+      <option value="Sales">Sales</option>
+      <option value="Operations">Operations</option>
+      <option value="Other">Other</option>
+    </select>
+    <textarea id="projNotes" placeholder="Notes / Details" rows="3"></textarea>
+    <button onclick="addProject()">Add Project</button>
+    <div id="projMsg" class="message"></div>
+    <ul id="projectList"></ul>
   </div>
 
   <!-- Tasks -->
-  <div id="tab4" class="tab-content" style="display:none">
-    <div class="card">
-      <h2>New Task</h2>
-      <input type="text" id="taskTitle" placeholder="Task description">
-      <select id="taskPriority">
-        <option value="High">High</option>
-        <option value="Medium">Medium</option>
-        <option value="Low">Low</option>
-      </select>
-      <button onclick="addTask()">Add Task</button>
-      <ul id="taskList"></ul>
-    </div>
+  <div id="tab3" class="card" style="display:none">
+    <h2>New Task</h2>
+    <input type="text" id="taskTitle" placeholder="Task">
+    <select id="taskPriority">
+      <option value="High">High</option>
+      <option value="Medium">Medium</option>
+      <option value="Low">Low</option>
+    </select>
+    <button onclick="addTask()">Add Task</button>
+    <div id="taskMsg" class="message"></div>
+    <ul id="taskList"></ul>
   </div>
 
   <!-- Expenses -->
-  <div id="tab5" class="tab-content" style="display:none">
-    <div class="card">
-      <h2>New Expense</h2>
-      <input type="text" id="expDesc" placeholder="Expense description">
-      <input type="number" id="expAmount" placeholder="Amount ($)" step="0.01">
-      <button onclick="addExpense()">Add Expense</button>
-      <ul id="expenseList"></ul>
-    </div>
+  <div id="tab4" class="card" style="display:none">
+    <h2>New Expense</h2>
+    <input type="text" id="expDesc" placeholder="Description">
+    <input type="number" id="expAmount" placeholder="Amount" step="0.01">
+    <button onclick="addExpense()">Add Expense</button>
+    <div id="expMsg" class="message"></div>
+    <ul id="expenseList"></ul>
   </div>
 
   <script>
-    let db = { leads: [], projects: [], sales: [], tasks: [], expenses: [] };
+    let db = { leads: [], projects: [], tasks: [], expenses: [] };
 
     function loadData() {
-      const saved = localStorage.getItem('flowforce_commercial');
+      const saved = localStorage.getItem('flowforce_v2');
       if (saved) db = JSON.parse(saved);
       renderAll();
+      updateDashboard();
     }
 
     function saveData() {
-      localStorage.setItem('flowforce_commercial', JSON.stringify(db));
+      localStorage.setItem('flowforce_v2', JSON.stringify(db));
+    }
+
+    function showMessage(id, text) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = text;
+        el.style.display = 'block';
+        setTimeout(() => el.style.display = 'none', 2500);
+      }
     }
 
     function showTab(n) {
-      document.querySelectorAll('.tab-content').forEach(div => div.style.display = 'none');
+      document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
       document.getElementById('tab' + n).style.display = 'block';
-      document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === n));
-      if (n === 0) updateDashboard();
+      document.querySelectorAll('.tabs button').forEach((b,i) => b.classList.toggle('active', i===n));
     }
 
     function renderAll() {
       // Leads
-      document.getElementById('leadList').innerHTML = db.leads.map(l => `<li><strong>${l.name}</strong> - ${l.contact} (${l.status})</li>`).join('');
+      document.getElementById('leadList').innerHTML = db.leads.map((l,i) => `
+        <li>
+          <span><strong>${l.name}</strong> - ${l.contact} (${l.status})</span>
+          <button onclick="deleteItem('leads', ${i})">Delete</button>
+        </li>
+      `).join('');
+
       // Projects
-      document.getElementById('projectList').innerHTML = db.projects.map(p => `<li>${p.name} - ${p.status}</li>`).join('');
-      // Sales
-      document.getElementById('saleList').innerHTML = db.sales.map(s => `<li>$${s.amount} - ${s.desc}</li>`).join('');
-      // Tasks
-      document.getElementById('taskList').innerHTML = db.tasks.map(t => `<li>${t.title} (${t.priority})</li>`).join('');
-      // Expenses
-      document.getElementById('expenseList').innerHTML = db.expenses.map(e => `<li>$${e.amount} - ${e.desc}</li>`).join('');
+      document.getElementById('projectList').innerHTML = db.projects.map((p,i) => `
+        <li>
+          <span><strong>${p.name}</strong> [${p.category}]<br>${p.notes}</span>
+          <button onclick="deleteItem('projects', ${i})">Delete</button>
+        </li>
+      `).join('');
+
+      // Tasks & Expenses (similar)
+      document.getElementById('taskList').innerHTML = db.tasks.map((t,i) => `<li>${t.title} (${t.priority}) <button onclick="deleteItem('tasks', ${i})">Delete</button></li>`).join('');
+      document.getElementById('expenseList').innerHTML = db.expenses.map((e,i) => `<li>$${e.amount} - ${e.desc} <button onclick="deleteItem('expenses', ${i})">Delete</button></li>`).join('');
     }
 
     function updateDashboard() {
-      document.getElementById('totalLeads').textContent = db.leads.length;
-      document.getElementById('activeProjects').textContent = db.projects.length;
+      const ctx = document.getElementById('dashChart');
+      if (window.myChart) window.myChart.destroy();
+      window.myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Leads', 'Projects', 'Tasks', 'Expenses'],
+          datasets: [{ label: 'Count', data: [db.leads.length, db.projects.length, db.tasks.length, db.expenses.length], backgroundColor: '#60a5fa' }]
+        }
+      });
     }
 
-    // Add Functions
     function addLead() {
       const name = document.getElementById('leadName').value.trim();
       const contact = document.getElementById('leadContact').value.trim();
@@ -164,33 +167,22 @@
         updateDashboard();
         document.getElementById('leadName').value = '';
         document.getElementById('leadContact').value = '';
-        alert('✅ Lead added!');
+        showMessage('leadMsg', '✅ Lead added successfully!');
       }
     }
 
     function addProject() {
-      const name = document.getElementById('projectName').value.trim();
-      const status = document.getElementById('projectStatus').value;
+      const name = document.getElementById('projName').value.trim();
+      const category = document.getElementById('projCategory').value;
+      const notes = document.getElementById('projNotes').value.trim();
       if (name) {
-        db.projects.push({name, status});
+        db.projects.push({name, category, notes});
         saveData();
         renderAll();
         updateDashboard();
-        document.getElementById('projectName').value = '';
-        alert('✅ Project added!');
-      }
-    }
-
-    function addSale() {
-      const desc = document.getElementById('saleDesc').value.trim();
-      const amount = parseFloat(document.getElementById('saleAmount').value);
-      if (desc && amount) {
-        db.sales.push({desc, amount});
-        saveData();
-        renderAll();
-        document.getElementById('saleDesc').value = '';
-        document.getElementById('saleAmount').value = '';
-        alert('✅ Sale recorded!');
+        document.getElementById('projName').value = '';
+        document.getElementById('projNotes').value = '';
+        showMessage('projMsg', '✅ Project added successfully!');
       }
     }
 
@@ -201,8 +193,9 @@
         db.tasks.push({title, priority});
         saveData();
         renderAll();
+        updateDashboard();
         document.getElementById('taskTitle').value = '';
-        alert('✅ Task added!');
+        showMessage('taskMsg', '✅ Task added successfully!');
       }
     }
 
@@ -213,13 +206,23 @@
         db.expenses.push({desc, amount});
         saveData();
         renderAll();
+        updateDashboard();
         document.getElementById('expDesc').value = '';
         document.getElementById('expAmount').value = '';
-        alert('✅ Expense added!');
+        showMessage('expMsg', '✅ Expense added successfully!');
       }
     }
 
-    // Initialize
+    function deleteItem(type, index) {
+      if (confirm("Delete this item?")) {
+        db[type].splice(index, 1);
+        saveData();
+        renderAll();
+        updateDashboard();
+      }
+    }
+
+    // Start
     loadData();
     showTab(0);
   </script>
