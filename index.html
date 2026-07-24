@@ -2,21 +2,117 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Flow-Force Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flow-Force Database</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background: #0f172a; color: #e2e8f0; margin: 0; padding: 20px; }
+    h1 { text-align: center; color: #60a5fa; }
+    .subtitle { text-align: center; color: #94a3b8; }
+    .tabs button { padding: 12px 20px; margin: 5px; background: #1e2937; color: white; border: none; border-radius: 8px; cursor: pointer; }
+    .tabs button.active { background: #3b82f6; }
+    .card { background: #1e2937; padding: 20px; border-radius: 12px; margin: 20px 0; }
+    input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #334155; border: none; border-radius: 6px; color: white; }
+    button { padding: 12px 20px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    li { background: #334155; padding: 12px; margin: 8px 0; border-radius: 6px; display: flex; justify-content: space-between; }
+    .message { padding: 10px; background: #166534; color: #86efac; border-radius: 6px; margin: 10px 0; text-align: center; }
+  </style>
 </head>
 <body>
-  <h1>Flow-Force Test</h1>
-  <input type="text" id="input" placeholder="Type something">
-  <button onclick="testAdd()">Add</button>
-  <p id="output"></p>
+  <h1>🌊 Flow-Force</h1>
+  <p class="subtitle">Global Commercial Industries • Personal Database</p>
+
+  <div class="tabs">
+    <button class="active" onclick="showTab(0)">Tasks</button>
+    <button onclick="showTab(1)">Expenses</button>
+    <button onclick="showTab(2)">Notes</button>
+    <button onclick="showTab(3)">Goals</button>
+  </div>
+
+  <div id="tab0">
+    <div class="card">
+      <h2>Add Task</h2>
+      <input type="text" id="taskInput" placeholder="Enter task...">
+      <select id="priority">
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
+      </select>
+      <button onclick="addTask()">Add Task</button>
+    </div>
+    <div id="taskMsg" class="message" style="display:none"></div>
+    <ul id="taskList"></ul>
+  </div>
+
+  <div id="tab1" style="display:none">
+    <div class="card">
+      <h2>Add Expense</h2>
+      <input type="text" id="expDesc" placeholder="Description">
+      <input type="number" id="expAmount" placeholder="Amount" step="0.01">
+      <button onclick="addExpense()">Add Expense</button>
+    </div>
+    <canvas id="chart" height="200"></canvas>
+    <ul id="expList"></ul>
+  </div>
 
   <script>
-    function testAdd() {
-      const text = document.getElementById('input').value;
-      document.getElementById('output').innerHTML = "✅ You added: " + text + "<br>Button is working!";
-      console.log("Button clicked! Text:", text);
+    let db = { tasks: [], expenses: [], notes: [], goals: [] };
+
+    function load() {
+      const saved = localStorage.getItem('flowforce');
+      if (saved) db = JSON.parse(saved);
+      render();
     }
-    console.log("JavaScript loaded successfully");
+
+    function save() {
+      localStorage.setItem('flowforce', JSON.stringify(db));
+    }
+
+    function showTab(n) {
+      document.querySelectorAll('body > div[id^="tab"]').forEach(div => div.style.display = 'none');
+      document.getElementById('tab' + n).style.display = 'block';
+      document.querySelectorAll('.tabs button').forEach((b,i) => b.classList.toggle('active', i===n));
+    }
+
+    function render() {
+      // Tasks
+      document.getElementById('taskList').innerHTML = db.tasks.map((t,i) => 
+        `<li>${t.text} (${t.priority})</li>`
+      ).join('');
+
+      // Expenses
+      document.getElementById('expList').innerHTML = db.expenses.map(e => 
+        `<li>$${e.amount} - ${e.desc}</li>`
+      ).join('');
+    }
+
+    function addTask() {
+      const text = document.getElementById('taskInput').value.trim();
+      if (!text) return;
+      db.tasks.push({ text, priority: document.getElementById('priority').value });
+      save();
+      render();
+      document.getElementById('taskInput').value = '';
+      const msg = document.getElementById('taskMsg');
+      msg.textContent = '✅ Task added!';
+      msg.style.display = 'block';
+      setTimeout(() => msg.style.display = 'none', 2000);
+    }
+
+    function addExpense() {
+      const desc = document.getElementById('expDesc').value.trim();
+      const amount = parseFloat(document.getElementById('expAmount').value);
+      if (!desc || !amount) return;
+      db.expenses.push({desc, amount});
+      save();
+      render();
+      document.getElementById('expDesc').value = '';
+      document.getElementById('expAmount').value = '';
+      alert('✅ Expense added!');
+    }
+
+    load();
+    showTab(0);
   </script>
 </body>
 </html>
