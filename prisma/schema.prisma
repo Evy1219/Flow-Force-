@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleType {
+  OWNER
+  ADMIN
+  MANAGER
+  SUPERVISOR
+  EMPLOYEE
+  GUEST
+  CUSTOM
+}
+
+enum BusinessType {
+  CONSTRUCTION
+  HEALTHCARE
+  RESTAURANT
+  RETAIL
+  WAREHOUSE
+  MANUFACTURING
+  LAW_FIRM
+  ACCOUNTING
+  MARKETING_AGENCY
+  SOFTWARE_COMPANY
+  EDUCATION
+  NON_PROFIT
+  GOVERNMENT
+  AUTOMOTIVE
+  REAL_ESTATE
+  FITNESS
+  SALON
+  HOSPITALITY
+  ENGINEERING
+  ARCHITECTURE
+  CUSTOM
+}
+
+enum Status {
+  ACTIVE
+  INVITED
+  PENDING
+  INACTIVE
+}
+
+model User {
+  id                String         @id @default(cuid())
+  email             String         @unique
+  passwordHash      String
+  firstName         String
+  lastName          String
+  avatarUrl         String?
+  isEmailVerified   Boolean        @default(false)
+  isActive          Boolean        @default(true)
+  rememberMe        Boolean        @default(false)
+  lastLoginAt       DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  organizationId    String?
+  role              RoleType       @default(EMPLOYEE)
+  organization      Organization?  @relation(fields: [organizationId], references: [id])
+  sessions          Session[]
+  auditLogs         AuditLog[]
+  tasks             Task[]
+  notifications     Notification[]
+  activityEntries   ActivityEntry[]
+}
+
+model Organization {
+  id              String         @id @default(cuid())
+  name            String
+  logoUrl         String?
+  primaryColor    String         @default("#3f6df6")
+  secondaryColor  String         @default("#0f172a")
+  timezone        String         @default("UTC")
+  currency        String         @default("USD")
+  businessType    BusinessType   @default(CUSTOM)
+  status          Status         @default(ACTIVE)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  users           User[]
+  departments     Department[]
+  projects        Project[]
+  documents       Document[]
+  settings        OrganizationSettings?
+}
+
+model OrganizationSettings {
+  id               String        @id @default(cuid())
+  organizationId   String        @unique
+  theme            String        @default("light")
+  modules          String[]      @default([])
+  notifications    Json          @default("{}")
+  security         Json          @default("{}")
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  organization     Organization  @relation(fields: [organizationId], references: [id])
+}
+
+model Department {
+  id             String         @id @default(cuid())
+  name           String
+  organizationId String
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  users          User[]         @relation("DepartmentUsers")
+  createdAt      DateTime       @default(now())
+}
+
+model Session {
+  id            String   @id @default(cuid())
+  tokenHash     String   @unique
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  expiresAt     DateTime
+  rememberMe    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  revokedAt     DateTime?
+}
+
+model Project {
+  id             String        @id @default(cuid())
+  name           String
+  description    String?
+  status         String        @default("active")
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+  tasks          Task[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model Task {
+  id             String        @id @default(cuid())
+  title          String
+  description    String?
+  priority       String        @default("medium")
+  status         String        @default("todo")
+  dueDate        DateTime?
+  projectId      String?
+  project        Project?      @relation(fields: [projectId], references: [id])
+  ownerId        String?
+  owner          User?         @relation(fields: [ownerId], references: [id])
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  title       String
+  body        String
+  type        String   @default("info")
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model ActivityEntry {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  action      String
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now())
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  action      String
+  entity      String
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now())
+}
+
+model Document {
+  id             String        @id @default(cuid())
+  name           String
+  path           String
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime      @default(now())
+}
+
+model DepartmentUsers {
+  A String
+  B String
+
+  @@id([A, B])
+}
