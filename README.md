@@ -1,3 +1,7 @@
-Flowforce. A new project starting 07/24/26. 
+# Todo List Database
 
-DataBase for global commercial industries. 
+Simple personal todo list using SQLite.
+
+## How to use:
+1. Run `python init_db.py`
+2. Run `python example.py`
