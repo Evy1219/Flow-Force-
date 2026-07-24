@@ -4,56 +4,130 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Flow-Force • Commercial OS</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: 'Inter', Arial, sans-serif; background: #0f172a; color: #e2e8f0; margin: 0; padding: 20px; }
-    h1 { text-align: center; color: #60a5fa; }
-    .subtitle { text-align: center; color: #94a3b8; }
-    .tabs button { padding: 12px 20px; margin: 5px; background: #1e2937; border: none; color: white; border-radius: 50px; cursor: pointer; }
-    .tabs button.active { background: #3b82f6; }
-    .card { background: #1e2937; padding: 25px; border-radius: 16px; margin: 20px 0; }
-    input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #334155; border: none; border-radius: 8px; color: white; }
-    button { padding: 10px 18px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; margin: 5px; }
-    li { background: #334155; padding: 15px; margin: 10px 0; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-    .message { padding: 12px; background: #166534; color: #86efac; border-radius: 10px; text-align: center; margin: 10px 0; display: none; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background: #0f172a; 
+      color: #e2e8f0; 
+      margin: 0; 
+      padding: 15px; 
+      line-height: 1.5;
+    }
+    h1 { text-align: center; color: #60a5fa; margin: 10px 0; }
+    .subtitle { text-align: center; color: #94a3b8; margin-bottom: 25px; font-size: 15px; }
+    
+    .overview {
+      background: #1e2937; 
+      padding: 15px; 
+      border-radius: 12px; 
+      text-align: center; 
+      margin-bottom: 20px;
+      font-size: 15px;
+    }
+    
+    .tabs { 
+      display: flex; 
+      flex-wrap: wrap; 
+      justify-content: center; 
+      gap: 8px; 
+      margin: 20px 0; 
+    }
+    .tab { 
+      padding: 10px 18px; 
+      background: #1e2937; 
+      border: none; 
+      color: white; 
+      border-radius: 50px; 
+      cursor: pointer; 
+      font-size: 14px;
+    }
+    .tab.active { background: #3b82f6; }
+
+    .card { 
+      background: #1e2937; 
+      padding: 18px; 
+      border-radius: 12px; 
+      margin-bottom: 20px; 
+    }
+    input, select, textarea { 
+      width: 100%; 
+      padding: 10px; 
+      margin: 8px 0; 
+      background: #334155; 
+      border: none; 
+      border-radius: 8px; 
+      color: white; 
+      font-size: 15px;
+    }
+    button { 
+      padding: 10px 16px; 
+      background: #3b82f6; 
+      color: white; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      font-size: 14px;
+    }
+    li { 
+      background: #334155; 
+      padding: 12px; 
+      margin: 8px 0; 
+      border-radius: 10px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      font-size: 15px;
+    }
+    .message { 
+      padding: 10px; 
+      background: #166534; 
+      color: #86efac; 
+      border-radius: 8px; 
+      text-align: center; 
+      margin: 10px 0; 
+      display: none; 
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
-  <h1>🌊 Flow-Force Commercial OS</h1>
-  <p class="subtitle">Global Commercial Industries • Business Operations Hub</p>
+  <h1>🌊 Flow-Force</h1>
+  <p class="subtitle">Global Commercial Industries • Operations Hub</p>
+
+  <div class="overview">
+    <strong>Overview:</strong> 
+    Schedule: <span id="countSchedule">0</span> | 
+    Projects: <span id="countProjects">0</span> | 
+    Tasks: <span id="countTasks">0</span> | 
+    Expenses: <span id="countExpenses">0</span>
+  </div>
 
   <div class="tabs">
-    <button class="active" onclick="showTab(0)">Dashboard</button>
-    <button onclick="showTab(1)">Leads</button>
-    <button onclick="showTab(2)">Projects</button>
-    <button onclick="showTab(3)">Tasks</button>
-    <button onclick="showTab(4)">Expenses</button>
+    <button class="tab active" onclick="showTab(0)">Schedule</button>
+    <button class="tab" onclick="showTab(1)">Projects</button>
+    <button class="tab" onclick="showTab(2)">Tasks</button>
+    <button class="tab" onclick="showTab(3)">Expenses</button>
   </div>
 
-  <!-- Dashboard -->
+  <!-- Schedule -->
   <div id="tab0" class="card">
-    <h2>Business Overview</h2>
-    <canvas id="dashChart" height="200"></canvas>
-  </div>
-
-  <!-- Leads -->
-  <div id="tab1" class="card" style="display:none">
-    <h2>New Lead</h2>
-    <input type="text" id="leadName" placeholder="Client / Company">
-    <input type="text" id="leadContact" placeholder="Contact Info">
-    <select id="leadStatus">
-      <option value="New">New</option>
-      <option value="Contacted">Contacted</option>
-      <option value="Negotiation">Negotiation</option>
-      <option value="Closed">Closed</option>
+    <h2>New Schedule / Appointment</h2>
+    <input type="text" id="schedTitle" placeholder="Meeting / Appointment Title">
+    <input type="text" id="schedDate" placeholder="Date & Time (e.g. Jul 28, 10:00 AM)">
+    <select id="schedType">
+      <option value="Meeting">Meeting</option>
+      <option value="Call">Call</option>
+      <option value="Deadline">Deadline</option>
+      <option value="Other">Other</option>
     </select>
-    <button onclick="addLead()">Add Lead</button>
-    <div id="leadMsg" class="message"></div>
-    <ul id="leadList"></ul>
+    <button onclick="addSchedule()">Add to Schedule</button>
+    <div id="schedMsg" class="message"></div>
+    <ul id="scheduleList"></ul>
   </div>
 
-  <!-- Projects (Enhanced) -->
-  <div id="tab2" class="card" style="display:none">
+  <!-- Projects -->
+  <div id="tab1" class="card" style="display:none">
     <h2>New Project</h2>
     <input type="text" id="projName" placeholder="Project Name">
     <select id="projCategory">
@@ -61,18 +135,17 @@
       <option value="Marketing">Marketing</option>
       <option value="Sales">Sales</option>
       <option value="Operations">Operations</option>
-      <option value="Other">Other</option>
     </select>
-    <textarea id="projNotes" placeholder="Notes / Details" rows="3"></textarea>
+    <textarea id="projNotes" rows="2" placeholder="Notes..."></textarea>
     <button onclick="addProject()">Add Project</button>
     <div id="projMsg" class="message"></div>
     <ul id="projectList"></ul>
   </div>
 
   <!-- Tasks -->
-  <div id="tab3" class="card" style="display:none">
+  <div id="tab2" class="card" style="display:none">
     <h2>New Task</h2>
-    <input type="text" id="taskTitle" placeholder="Task">
+    <input type="text" id="taskTitle" placeholder="Task description">
     <select id="taskPriority">
       <option value="High">High</option>
       <option value="Medium">Medium</option>
@@ -84,90 +157,80 @@
   </div>
 
   <!-- Expenses -->
-  <div id="tab4" class="card" style="display:none">
+  <div id="tab3" class="card" style="display:none">
     <h2>New Expense</h2>
     <input type="text" id="expDesc" placeholder="Description">
-    <input type="number" id="expAmount" placeholder="Amount" step="0.01">
+    <input type="number" id="expAmount" placeholder="Amount ($)" step="0.01">
     <button onclick="addExpense()">Add Expense</button>
     <div id="expMsg" class="message"></div>
     <ul id="expenseList"></ul>
   </div>
 
   <script>
-    let db = { leads: [], projects: [], tasks: [], expenses: [] };
+    let db = { schedule: [], projects: [], tasks: [], expenses: [] };
 
     function loadData() {
-      const saved = localStorage.getItem('flowforce_v2');
+      const saved = localStorage.getItem('flowforce_final');
       if (saved) db = JSON.parse(saved);
       renderAll();
-      updateDashboard();
     }
 
     function saveData() {
-      localStorage.setItem('flowforce_v2', JSON.stringify(db));
+      localStorage.setItem('flowforce_final', JSON.stringify(db));
     }
 
     function showMessage(id, text) {
-      const el = document.getElementById(id);
-      if (el) {
-        el.textContent = text;
-        el.style.display = 'block';
-        setTimeout(() => el.style.display = 'none', 2500);
-      }
+      const msg = document.getElementById(id);
+      msg.textContent = text;
+      msg.style.display = 'block';
+      setTimeout(() => msg.style.display = 'none', 2200);
     }
 
     function showTab(n) {
       document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
       document.getElementById('tab' + n).style.display = 'block';
-      document.querySelectorAll('.tabs button').forEach((b,i) => b.classList.toggle('active', i===n));
+      document.querySelectorAll('.tab').forEach((b, i) => b.classList.toggle('active', i === n));
     }
 
     function renderAll() {
-      // Leads
-      document.getElementById('leadList').innerHTML = db.leads.map((l,i) => `
-        <li>
-          <span><strong>${l.name}</strong> - ${l.contact} (${l.status})</span>
-          <button onclick="deleteItem('leads', ${i})">Delete</button>
-        </li>
-      `).join('');
+      // Schedule
+      document.getElementById('scheduleList').innerHTML = db.schedule.map((s,i) => 
+        `<li><strong>${s.title}</strong> — ${s.date} (${s.type}) <button onclick="deleteItem('schedule',${i})">Delete</button></li>`
+      ).join('');
 
       // Projects
-      document.getElementById('projectList').innerHTML = db.projects.map((p,i) => `
-        <li>
-          <span><strong>${p.name}</strong> [${p.category}]<br>${p.notes}</span>
-          <button onclick="deleteItem('projects', ${i})">Delete</button>
-        </li>
-      `).join('');
+      document.getElementById('projectList').innerHTML = db.projects.map((p,i) => 
+        `<li><strong>${p.name}</strong> [${p.category}]<br>${p.notes} <button onclick="deleteItem('projects',${i})">Delete</button></li>`
+      ).join('');
 
-      // Tasks & Expenses (similar)
-      document.getElementById('taskList').innerHTML = db.tasks.map((t,i) => `<li>${t.title} (${t.priority}) <button onclick="deleteItem('tasks', ${i})">Delete</button></li>`).join('');
-      document.getElementById('expenseList').innerHTML = db.expenses.map((e,i) => `<li>$${e.amount} - ${e.desc} <button onclick="deleteItem('expenses', ${i})">Delete</button></li>`).join('');
+      // Tasks
+      document.getElementById('taskList').innerHTML = db.tasks.map((t,i) => 
+        `<li>${t.title} (${t.priority}) <button onclick="deleteItem('tasks',${i})">Delete</button></li>`
+      ).join('');
+
+      // Expenses
+      document.getElementById('expenseList').innerHTML = db.expenses.map((e,i) => 
+        `<li>$${e.amount} — ${e.desc} <button onclick="deleteItem('expenses',${i})">Delete</button></li>`
+      ).join('');
+
+      // Overview counts
+      document.getElementById('countSchedule').textContent = db.schedule.length;
+      document.getElementById('countProjects').textContent = db.projects.length;
+      document.getElementById('countTasks').textContent = db.tasks.length;
+      document.getElementById('countExpenses').textContent = db.expenses.length;
     }
 
-    function updateDashboard() {
-      const ctx = document.getElementById('dashChart');
-      if (window.myChart) window.myChart.destroy();
-      window.myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Leads', 'Projects', 'Tasks', 'Expenses'],
-          datasets: [{ label: 'Count', data: [db.leads.length, db.projects.length, db.tasks.length, db.expenses.length], backgroundColor: '#60a5fa' }]
-        }
-      });
-    }
-
-    function addLead() {
-      const name = document.getElementById('leadName').value.trim();
-      const contact = document.getElementById('leadContact').value.trim();
-      const status = document.getElementById('leadStatus').value;
-      if (name) {
-        db.leads.push({name, contact, status});
+    function addSchedule() {
+      const title = document.getElementById('schedTitle').value.trim();
+      const date = document.getElementById('schedDate').value.trim();
+      const type = document.getElementById('schedType').value;
+      if (title && date) {
+        db.schedule.push({title, date, type});
         saveData();
         renderAll();
-        updateDashboard();
-        document.getElementById('leadName').value = '';
-        document.getElementById('leadContact').value = '';
-        showMessage('leadMsg', '✅ Lead added successfully!');
+        document.getElementById('schedTitle').value = '';
+        document.getElementById('schedDate').value = '';
+        showMessage('schedMsg', '✅ Added to Schedule!');
       }
     }
 
@@ -179,10 +242,9 @@
         db.projects.push({name, category, notes});
         saveData();
         renderAll();
-        updateDashboard();
         document.getElementById('projName').value = '';
         document.getElementById('projNotes').value = '';
-        showMessage('projMsg', '✅ Project added successfully!');
+        showMessage('projMsg', '✅ Project added!');
       }
     }
 
@@ -193,9 +255,8 @@
         db.tasks.push({title, priority});
         saveData();
         renderAll();
-        updateDashboard();
         document.getElementById('taskTitle').value = '';
-        showMessage('taskMsg', '✅ Task added successfully!');
+        showMessage('taskMsg', '✅ Task added!');
       }
     }
 
@@ -206,19 +267,17 @@
         db.expenses.push({desc, amount});
         saveData();
         renderAll();
-        updateDashboard();
         document.getElementById('expDesc').value = '';
         document.getElementById('expAmount').value = '';
-        showMessage('expMsg', '✅ Expense added successfully!');
+        showMessage('expMsg', '✅ Expense added!');
       }
     }
 
-    function deleteItem(type, index) {
+    function deleteItem(category, index) {
       if (confirm("Delete this item?")) {
-        db[type].splice(index, 1);
+        db[category].splice(index, 1);
         saveData();
         renderAll();
-        updateDashboard();
       }
     }
 
