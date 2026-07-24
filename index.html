@@ -89,6 +89,30 @@
       display: none; 
       font-size: 14px;
     }
+    .expense-section {
+      margin-top: 22px;
+      padding-top: 10px;
+      border-top: 1px solid #334155;
+    }
+    .expense-section h3 {
+      margin-bottom: 12px;
+      color: #93c5fd;
+    }
+    .expense-section input,
+    .expense-section select,
+    .expense-section button {
+      margin-top: 10px;
+    }
+    .expense-section ul {
+      margin-top: 12px;
+      padding-left: 0;
+      list-style: none;
+    }
+    .subcategory {
+      color: #a5b4fc;
+      font-size: 12px;
+      margin-left: 8px;
+    }
     .expense-total {
       margin-top: 12px;
       padding: 12px;
@@ -170,19 +194,52 @@
   <div id="tab3" class="card" style="display:none">
     <h2>New Expense</h2>
     <input type="text" id="expDesc" placeholder="Description">
+    <select id="expCategory">
+      <option value="General">General</option>
+      <option value="Travel">Travel</option>
+      <option value="Office">Office</option>
+      <option value="Supplies">Supplies</option>
+      <option value="Software">Software</option>
+      <option value="Misc">Misc</option>
+    </select>
     <input type="number" id="expAmount" placeholder="Amount ($)" step="0.01">
     <button onclick="addExpense()">Add Expense</button>
     <div id="expMsg" class="message"></div>
-    <ul id="expenseList"></ul>
-    <div class="expense-total">Total: $<span id="expenseTotal">0.00</span></div>
+
+    <div class="expense-section">
+      <h3>Current Expenses</h3>
+      <ul id="expenseList"></ul>
+      <div class="expense-total">Total: $<span id="expenseTotal">0.00</span></div>
+    </div>
+
+    <div class="expense-section">
+      <h3>Upcoming Expenses</h3>
+      <input type="text" id="upDesc" placeholder="Description">
+      <select id="upCategory">
+        <option value="General">General</option>
+        <option value="Travel">Travel</option>
+        <option value="Office">Office</option>
+        <option value="Supplies">Supplies</option>
+        <option value="Software">Software</option>
+        <option value="Misc">Misc</option>
+      </select>
+      <input type="number" id="upAmount" placeholder="Amount ($)" step="0.01">
+      <button onclick="addUpcomingExpense()">Add Upcoming Expense</button>
+      <div id="upMsg" class="message"></div>
+      <ul id="upcomingList"></ul>
+      <div class="expense-total">Upcoming Total: $<span id="upcomingTotal">0.00</span></div>
+    </div>
   </div>
 
   <script>
-    let db = { schedule: [], projects: [], tasks: [], expenses: [] };
+    let db = { schedule: [], projects: [], tasks: [], expenses: [], upcomingExpenses: [] };
 
     function loadData() {
       const saved = localStorage.getItem('flowforce_final');
-      if (saved) db = JSON.parse(saved);
+      if (saved) {
+        db = JSON.parse(saved);
+        if (!Array.isArray(db.upcomingExpenses)) db.upcomingExpenses = [];
+      }
       renderAll();
     }
 
@@ -221,11 +278,17 @@
 
       // Expenses
       document.getElementById('expenseList').innerHTML = db.expenses.map((e,i) => 
-        `<li>$${e.amount.toFixed(2)} — ${e.desc} <button onclick="deleteItem('expenses',${i})">Delete</button></li>`
+        `<li><span>$${e.amount.toFixed(2)}</span><span>${e.desc}</span><span class="subcategory">[${e.category}]</span> <button onclick="deleteItem('expenses',${i})">Delete</button></li>`
+      ).join('');
+
+      document.getElementById('upcomingList').innerHTML = db.upcomingExpenses.map((e,i) => 
+        `<li><span>$${e.amount.toFixed(2)}</span><span>${e.desc}</span><span class="subcategory">[${e.category}]</span> <button onclick="deleteItem('upcomingExpenses',${i})">Delete</button></li>`
       ).join('');
 
       const total = db.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+      const upcomingTotal = db.upcomingExpenses.reduce((sum, expense) => sum + expense.amount, 0);
       document.getElementById('expenseTotal').textContent = total.toFixed(2);
+      document.getElementById('upcomingTotal').textContent = upcomingTotal.toFixed(2);
 
       // Overview counts
       document.getElementById('countSchedule').textContent = db.schedule.length;
@@ -276,14 +339,29 @@
 
     function addExpense() {
       const desc = document.getElementById('expDesc').value.trim();
+      const category = document.getElementById('expCategory').value;
       const amount = parseFloat(document.getElementById('expAmount').value);
       if (desc && amount) {
-        db.expenses.push({desc, amount});
+        db.expenses.push({desc, category, amount});
         saveData();
         renderAll();
         document.getElementById('expDesc').value = '';
         document.getElementById('expAmount').value = '';
         showMessage('expMsg', '✅ Expense added!');
+      }
+    }
+
+    function addUpcomingExpense() {
+      const desc = document.getElementById('upDesc').value.trim();
+      const category = document.getElementById('upCategory').value;
+      const amount = parseFloat(document.getElementById('upAmount').value);
+      if (desc && amount) {
+        db.upcomingExpenses.push({desc, category, amount});
+        saveData();
+        renderAll();
+        document.getElementById('upDesc').value = '';
+        document.getElementById('upAmount').value = '';
+        showMessage('upMsg', '✅ Upcoming expense added!');
       }
     }
 
