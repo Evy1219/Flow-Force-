@@ -89,6 +89,16 @@
       display: none; 
       font-size: 14px;
     }
+    .expense-total {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #0f172a;
+      color: #f8fafc;
+      font-weight: 700;
+      text-align: right;
+      border: 1px solid #334155;
+    }
   </style>
 </head>
 <body>
@@ -164,6 +174,7 @@
     <button onclick="addExpense()">Add Expense</button>
     <div id="expMsg" class="message"></div>
     <ul id="expenseList"></ul>
+    <div class="expense-total">Total: $<span id="expenseTotal">0.00</span></div>
   </div>
 
   <script>
@@ -210,8 +221,11 @@
 
       // Expenses
       document.getElementById('expenseList').innerHTML = db.expenses.map((e,i) => 
-        `<li>$${e.amount} — ${e.desc} <button onclick="deleteItem('expenses',${i})">Delete</button></li>`
+        `<li>$${e.amount.toFixed(2)} — ${e.desc} <button onclick="deleteItem('expenses',${i})">Delete</button></li>`
       ).join('');
+
+      const total = db.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+      document.getElementById('expenseTotal').textContent = total.toFixed(2);
 
       // Overview counts
       document.getElementById('countSchedule').textContent = db.schedule.length;
